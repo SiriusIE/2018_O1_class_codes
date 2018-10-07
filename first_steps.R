@@ -14,11 +14,21 @@
 # Types of variables
 
 
+#### WORKING DIRECTORY ###
+
+
+getwd() # our first r function
+#setwd() # to specify any path as working directory
+
+list.files()
+list.dirs('/Users/ssobrinou/Documents/')
+
+
 #### VARIABLE ASSIGNMENT ####
 
 x <- 1
 x
-print(x)  # our first r function
+print(x)  
 
 y<- x + 1
 print(y)
