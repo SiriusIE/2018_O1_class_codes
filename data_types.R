@@ -128,7 +128,7 @@ str(df)
 
 # by the simbol $ we can access any of the variables in the data frame (always by column)
 
-df$v_1
+df$v_2
 
 # matrix subsetting is also allowed
 
@@ -197,7 +197,7 @@ mtcars[mtcars$cyl>6,]
 mtcars[mtcars$mpg>15&mtcars$hp>150,c('wt','disp')]
 
 subset(mtcars,hp>100&hp<200) # can use the subset function for simplicity of reading
-
+subset(mtcars, hp%in%c(100,200))
 subset(mtcars,subset=wt>=4,select=c('drat','mpg','wt'))
 subset(mtcars,subset=wt>=4,select=1:5)
 subset(mtcars,subset=wt>=4,select=-c(1:5))
@@ -274,6 +274,8 @@ length(mtcars$disp)-length(unique(mtcars$disp))
 mtcars[duplicated(mtcars), ]
 mtcars[!duplicated(mtcars), ]
 
+
+
 # NA treatment
 # complete.cases operates at a row level
 print(mtcars4)
@@ -342,7 +344,7 @@ fwrite(airquality,'example_data.frame.csv',row.names=FALSE, na="NA",quote= FALSE
 
 
 # reading the csv 
-head(a<-read.csv('example_data.frame.csv',sep=","))
+head(a<-read.csv('example_data.frame.csv',sep=";"))
 str(a)
 
 a<-data.table::fread('example_data.frame.csv')
@@ -393,6 +395,6 @@ lapply(a, summary)
 
 ### writing and reading list (and any kind of object) ####
 getwd()
-saveRDS(a,'prueba.Rda')
-readRDS('prueba.Rda')
+saveRDS(a,'prueba.RData')
+readRDS('prueba.RData')
 

@@ -30,7 +30,7 @@ x <- 1
 x
 print(x)  
 
-y<- x + 1
+y <- x + 1
 print(y)
 
 
@@ -93,7 +93,8 @@ x<-as.integer(x)
 class(x)
 
 # factor: used for cathegory grouping in some analysis (MALE/FEMALE, CONTINENT, LEVEL OF STUDIES)
-x<-factor(c('A','B','A','C','B','A'),levels = c('A','B','C'))
+x<-c('A','B','A','C','B','A')
+x<-factor(x,levels = c('C','B','A'))
 class(x)
 print(x)
 plot(x)  # our first plot! as x is a factor R will bar-plot the counting of each level frome the factor variable 
@@ -182,7 +183,7 @@ mean(x); median(x); var(x); sd(x)
 # summary: applied to a numeric vector, returns a basic statistic summary
 summary(x)  
 
-summary(z<-c(2,3,NA))
+summary(z<-c(2,3,NA))]
 
 y<-rep(1,length(x))
 
@@ -191,7 +192,7 @@ print(z)
 
 z+2
 
-z+rep(2,4)
+z+rep(2,5)
 
 sum(y) # adds up the elements of a vector, resulting in a single number
 sum(x,y) # adds the elements of both vectors, resulting in a single number
@@ -208,8 +209,7 @@ as.numeric(is.na(y))
 
 
 # think...how could we easily count the number of NA's in a vector?
-sum(is.na(x))
-sum(is.na(y))
+
 
 # logic operators
 
@@ -243,7 +243,6 @@ help('&&')
 
 # think...how could we easily check for the presence of any NA in a vector?
 y<-c(78,NA,34,NA,NA)
-sum(is.na(y))>0
 
 
 # basic functions for characters
