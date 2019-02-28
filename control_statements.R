@@ -19,7 +19,7 @@ if(2>1) {
 }
 
 
-x<-2
+x<-45
 y<-2
 
 if(x==y){
@@ -42,11 +42,12 @@ if(!'data.table'%in%installed.packages()){
 
 if(!'data.table'%in%installed.packages()){
   install.packages('data.table')
-  library(data.table)
+
 } else {
   print('data.table is already installed')
-  library(data.table)
+
 }
+library(data.table)
 
 
 setwd("/Users/ssobrinou/IE")
@@ -58,7 +59,7 @@ if(getwd()!="/Users/ssobrinou/IE/Class Codes"){
 print(getwd())
 
 
-m<-matrix(runif(12), ncol=4)
+m<-matrix(runif(12), ncol=3)
 m
 
 n<-matrix(runif(12), nrow=4)
@@ -108,6 +109,7 @@ str(df)
 
 
 df[, powerful_car:=ifelse(hp>=150, TRUE, FALSE)]
+df$powerful_car<-ifelse(df$hp>=150, TRUE, FALSE)
 
 str(df)
 
@@ -130,38 +132,28 @@ if(!'lubridate'%in%installed.packages()){
 
 print(now())
 
-if(hour(now())>=6&hour(now())<12){
-  print("good morning!")
-} 
-
-x<-hour(now())
-print(x)
-
-if(x>=6&x<12){
-  print("good morning!")
-} else if (x>=12&x<17){
-  print("good afternoon!")
-} else if(x>=17&x<22){
-  print("good evening!")
-} else {
-  print('good night!')
-}
+### exercise: 
+# using a conditional structure, write a program that prints "good morning!" if the
+# actual hour is in the interval [6, 12), "good afternoon!" if 
+# it's in [12, 17), "good evening!" if it's in [17, 22) or 
+# "good night!" if its in [22,6)
 
 
 
 # FOR LOOPS ####
 
-# applies a statement an arbitrary number of times, until a specified counter ends
+# applies a statement iteratively an arbitrary number of times, until a specified counter ends
 
 for(i in 1:5) print(1:i)
 
-for ( i in 1:1000) {
+for (i in 1:1000) {
   print(sqrt(i))
   
 }
 
 df<-iris
 for ( i in 1:ncol(df)) {
+  print(colnames(df)[i])
   print(class(df[,i]))
   
 }
@@ -169,35 +161,23 @@ for ( i in 1:ncol(df)) {
 df<-read.csv('../df_states.csv', sep=';')
 str(df)
 
-for (variable in names(df)) {
-  print(class(df[,variable]))
+for (gewfdbwe in names(df)) {
+  print(class(df[,gewfdbwe]))
   
 }
 
 
 x<-seq(1:10)
 results<-numeric()
-for ( i in 1:10) {
-  results[i]<-if(x[i]%%2==0) {'even'} else {'odd'}
+for ( s in c(1, 3, 5)) {
+  results[s]<-if(x[s]%%2==0) {'even'} else {'odd'}
 }
 
 
-# excersise:
+### exercise: 
+# read the df_states.csv dataset with the option stringsAsFactors=F
+# making use of a for loop and a conditional statement, change any character variable to be a factor
 
-# 1. read the df_states.csv dataset with the option stringsAsFactors=F
-# 2. making use of a for loop and a conditional statement, change any character variable to be a factor
-
-df<-read.csv('../df_states.csv',sep=';', stringsAsFactors = F)
-str(df)
-
-
-for(i in colnames(df)){
-  if(class(df[,i])=='character'){
-    df[, i]<-as.factor(df[, i])
-  }
-}
-
-str(df)
 
 
 # load the state dataset
@@ -225,7 +205,7 @@ winner
 # using a for loop to programatically save some plots
 
 for(i in 1:10){
-png(filename = paste(paste('../plot',i, sep='_'), 'png', sep='.'))
+png(filename = paste(paste('plot',i, sep='_'), 'png', sep='.'))
 plot(hist(rnorm(1000)))
 dev.off()
 }
@@ -240,6 +220,8 @@ data(state)
 data_center<-as.matrix(cbind(state.center$x,state.center$y))
 colnames(data_center)<-c('x','y')
 rownames(data_center)<-state.abb
+
+data_center[1:10, ]
 
 # we first create and emply matrix called distances to store the results
 distances<-matrix(NA, nrow=nrow(data_center),
@@ -258,6 +240,7 @@ for (i in 1:nrow(distances)){
   }
 }
 distances[1:10,1:10]
+View(distances)
 
 
 # lets ckech ans example
@@ -300,9 +283,21 @@ for ( i in 1:10) {
 k=0
 while( k <= 10 ){
   print(sqrt(k))
-  k<-k+1
+  # k<-k+1
 }
 
+
+# apending through a for loop
+
+df<-data.table()
+df
+
+
+for(i in 1:1000){
+  df<-rbind(df,data.table(x=rnorm(1), y=runif(1), z=rnorm(1)))
+}
+
+df
 
 # LAPPLY FAMILY OF FUNCTIONS ####
 class(distances)
@@ -317,7 +312,10 @@ apply(distances,1,mean)
 # when applied to a data.frame, it applies the function to each column of the data.frame
 
 df_states<-read.csv('../df_states.csv', sep=';')
+saveRDS(df_states,'df_states.RData')
+df_states<-readRDS('df_states.RData')
 
+str(df_states)
 
 lapply(df_states, class)
 lapply(df_states, summary)
@@ -342,7 +340,7 @@ lapply(df_states,class)
 sapply(df_states,class)
 
 sapply(df_states,is.numeric)
-sapply(df_states[ ,names(df_states)[sapply(df_states,is.numeric)]],summary)
+lapply(df_states[ ,names(df_states)[sapply(df_states,is.numeric)]],summary)
 
 
 

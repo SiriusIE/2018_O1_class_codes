@@ -35,6 +35,7 @@ dim(m) # gets the dimension of the matrix
 
 
 # colnames and rownames for naming the matrix cols and rows, always a best practice
+colnames(m)
 colnames(m)<-paste0(rep('col',4),seq(1,4))
 rownames(m)<-paste0(rep('row',3),seq(1,3))
 
@@ -128,11 +129,12 @@ str(df)
 
 # by the simbol $ we can access any of the variables in the data frame (always by column)
 
-df$v_2
+df$v_1
 
 # matrix subsetting is also allowed
 
 df[ ,1]
+df[ , c('v_1','v_2')]
 df[3,2]
 
 # importing a native R dataset (just by calling data(x)...see library(help = "datasets"))
@@ -159,7 +161,7 @@ ncol(mtcars)
 mtcars$mpg
 
 # with $ we can create a new variable
-
+mtcars$model
 mtcars$model<-rownames(mtcars)
 
 # to remove a variable we can either assign it a NULL value
@@ -176,7 +178,7 @@ mtcars<-mtcars[,-ncol(mtcars)]
 
 head(mtcars)
 mtcars[1,1] 
-mtcars[ ,1]  
+mtcars[ ,1] # mtcars$mpg # mtcars[, 'mpg']
 mtcars[1:3, ]
 mtcars[c(1,3,5),c(2,4,6)]
 mtcars[,'mpg']
@@ -192,11 +194,12 @@ mtcars[c('mpg','wt')]
 mtcars[c(rep(F,12),rep(T, 20)), c(T,rep(FALSE, ncol(mtcars)-1))]
 
 # mtcars[cyl>6, ] # gives an error, we need to call the cyl variable with $ 
-mtcars[mtcars$cyl>6,] 
+get_in<-mtcars$cyl<6
+mtcars[get_in, ] 
 
-mtcars[mtcars$mpg>15&mtcars$hp>150,c('wt','disp')]
+df<-mtcars[mtcars$mpg>15&mtcars$hp>150,c('wt','disp')]
 
-subset(mtcars,hp>100&hp<200) # can use the subset function for simplicity of reading
+subset(mtcars,hp>100|hp<200) # can use the subset function for simplicity of reading
 subset(mtcars, hp%in%c(100,200))
 subset(mtcars,subset=wt>=4,select=c('drat','mpg','wt'))
 subset(mtcars,subset=wt>=4,select=1:5)
@@ -204,7 +207,9 @@ subset(mtcars,subset=wt>=4,select=-c(1:5))
 
 
 # ordering a data.frame acording to one variable
-mtcars[order(mtcars$mpg),]  # ascending order
+var<-mtcars$mpg
+order_var<-order(var)
+mtcars[order_var,]  # ascending order
 mtcars[order(-mtcars$mpg),] # descending order
 
 
@@ -213,7 +218,9 @@ mtcars[order(mtcars$carb,mtcars$mpg),] # ordering by two variables
 # aggregated operations (group by)
 str(mtcars)
 
-aggregate(x=mtcars,FUN = mean, by=list(mtcars$carb))
+var_cat<-mtcars$carb
+
+aggregate(x=mtcars,FUN = mean, by=list(var_cat))
 aggregate(x=mtcars,FUN = max, by=list(mtcars$carb))
 
 aggregate(x=mtcars,FUN = mean, by=list(carb=mtcars$carb,vs=mtcars$vs))
@@ -272,7 +279,9 @@ unique(mtcars$cyl)
 length(mtcars$disp)-length(unique(mtcars$disp))
 
 mtcars[duplicated(mtcars), ]
-mtcars[!duplicated(mtcars), ]
+
+no_dupl_row<-!duplicated(mtcars)
+mtcars[no_dupl_row, ]
 
 
 
@@ -280,7 +289,8 @@ mtcars[!duplicated(mtcars), ]
 # complete.cases operates at a row level
 print(mtcars4)
 complete.cases(mtcars4)
-mtcars4[complete.cases(mtcars4), ]
+comple_rows<-complete.cases(mtcars4)
+mtcars4[comple_rows, ]
 
 # is.na operates at a element-wise level
 is.na(mtcars4)  # applies to each position of the data.frame
@@ -385,7 +395,7 @@ a[['letters']][1]
 a[[2]]['mpg']
 
 # with single square brackets, you create a slice of the original list (returning a new list)
-a[c(1,3)]  # sub list con el primer y segundo objeto de la list a
+a[c(1,3)]  
 a['letters']
 
 # lapply is a very powerful function to make vectorized operations over a list

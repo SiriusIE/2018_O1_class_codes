@@ -1,0 +1,177 @@
+---
+title: "Descriptive Analysis and Clustering"
+author: "Sirio Sobrino"
+date: "25/11/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Reading data
+
+We will work with the df_states data.set from the campus csv
+
+```{r}
+library(data.table)
+
+df<-fread('../df_states.csv', stringsAsFactors = T)
+
+str(df)
+head(df,5)
+
+```
+
+### Geo-visualization of data
+
+```{r}
+library(leaflet)
+
+map <- leaflet(df) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=~center.x, lat=~center.y,
+             popup=~name) 
+map
+
+```
+
+
+
+
+### Missingness Analysis
+
+```{r}
+sapply(df, function(var) return(sum(is.na(var))))
+```
+
+#### Missingness Map
+```{r}
+library(Amelia)
+missmap(df, legend = TRUE, col = c("black", "gray"), main='Missingnes map for df_states',y.labels = df$name, y.cex = 0.4)
+```
+
+
+#### Rebuilding the states data frame (with no NAs)
+```{r}
+data("state")
+df<-data.table(name=rownames(state.x77),
+               state.x77,
+               center.x=state.center$x, 
+               center.y=state.center$y)
+head(df)
+```
+
+
+#### Visualizing Socioeconomic Indicators
+```{r}
+map <- leaflet(df) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addCircleMarkers(lng=~center.x, lat=~center.y,
+                   popup=~paste(name,Murder, sep=' '),
+                   radius = ~Murder)
+map
+
+```
+
+#### Visualizing Correlations among the numeric variables
+```{r}
+library(corrplot)
+
+corrplot(cor(df[, sapply(df, is.numeric), with=F]))
+```
+
+
+
+
+#### Re-visualizing correlations, this time interactive:
+```{r}
+library(d3heatmap)
+
+d3heatmap::d3heatmap(cor(df[, sapply(df, is.numeric), with=F]))
+
+```
+
+
+#### create a subset with some variables of interest for clustering
+```{r}
+data_cluster<-scale(df[, sapply(df, is.numeric), with=F])  # we scale the variables to mean=0, sd=1
+head(data_cluster)
+```
+
+
+#### clustering the states based on numeric variables
+```{r}
+k=5
+kmeans_cluster<-kmeans(data_cluster,centers = k)
+print(kmeans_cluster)
+```
+
+
+#### Bring the cluster to the dataframe, and plot states by cluster-membership factor
+```{r}
+df[, cluster_k5:=as.factor(kmeans_cluster$cluster)]
+head(df)
+
+
+colorsmap = colors()[1:length(unique(df$cluster_k5))]
+groupColors = colorFactor(palette = "Set1", domain = df$cluster_k5)
+map <- leaflet(df) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addCircleMarkers(lng=~center.x, lat=~center.y,
+                   popup=~paste(name,cluster_k5, sep=' '),
+                   color=~groupColors(cluster_k5),
+                   group=~cluster_k5)
+map
+
+
+```
+
+
+#### Another clustering technique: Hierarquical Clustering
+```{r}
+d <- dist(data_cluster, method = "euclidean")
+
+fit <- hclust(d, method = "ward.D") 
+plot(fit, labels=df$name)
+
+
+rect.hclust(fit, k = k, border=1:k)
+
+df[, cluster_h:=factor(cutree(fit, k = k))]
+
+
+colorsmap = colors()[1:length(unique(df$cluster_h))]
+groupColors = colorFactor(palette = "Set1", domain = df$cluster_h)
+map <- leaflet(df) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addCircleMarkers(lng=~center.x, lat=~center.y,
+                   popup=~paste(name,cluster_h, sep=' '),
+                   color=~groupColors(cluster_h),
+                   group=~cluster_h)
+map
+
+
+```
+
+
+#### Creating a Linear Model to explain Income:
+```{r}
+lm1<-lm(Income~., data=df[, !c('name','cluster_k5','cluster_h','center.x','center.y')])
+
+print(summary(lm1))
+
+# calculating the fitted values
+df[, lm_fit:=fitted(lm1)]
+
+
+
+df_fit<-melt(df[, .(name,Income,lm_fit)], id.vars = 'name')
+
+
+library(ggplot2)
+ggplot(df_fit, aes(x=name, y=value, group=variable,colour=variable))+geom_line(lwd=1, alpha=0.7)+
+  scale_color_manual(values=c('black','red'))+
+  theme(axis.text.x=element_text(angle=90))
+
+```

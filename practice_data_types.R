@@ -311,8 +311,8 @@ data.table(df_states)[, .(Population=max(Population, na.rm = T),Income=max(Incom
 
 # 60. 
 data(iris)
-aggregate(iris[, which(names(iris)!='Species')], FUN = median, by=list(Species=iris$Species))
-data.table(iris)[, .(median_sepal_length=median(Sepal.Length),
+aggregate(iris[iris$Petal.Length>1.5, which(names(iris)!='Species')], FUN = median, by=list(Species=iris[iris$Petal.Length>1.5, ]$Species))
+data.table(iris)[Petal.Length>1.5, .(median_sepal_length=median(Sepal.Length),
                      median_sepal_width=median(Sepal.Width),
                      median_petal_length=median(Petal.Length),
                      median_petal_width=median(Petal.Width)), by='Species']

@@ -1,0 +1,122 @@
+---
+title: "Descriptive Analysis"
+author: "Sirio Sobrino"
+date: "25/11/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Loading data
+
+We will work with the df data.set from the carData package
+
+```{r}
+library(carData)
+library(data.table)
+data(Salaries)
+
+df<-data.table(Salaries)
+
+str(df)
+head(df,5)
+
+```
+
+### Summarizing variables
+
+```{r}
+summary(df[, names(df)[sapply(df, is.numeric)], with=F])
+summary(df[, names(df)[sapply(df, is.factor)], with=F])
+```
+
+### Correlation matrix from numeric variables
+
+```{r}
+library(corrplot)
+m<-cor(df[, names(df)[sapply(df, is.numeric)], with=F]); m
+corrplot(m)
+```
+
+We can also create a mixed correlation and scatterplot matrix in just one plot
+```{r}
+library(GGally)
+ggpairs(df[, names(df)[sapply(df, is.numeric)], with=F])
+```
+
+All tree variables are positive corrrelated among them, with an almost linear 
+relation between years of service and years since PhD
+
+
+* Years since PhD is a better predictor for salary, with a correlation above +40% with salaries
+
+
+### Does gender matter?
+
+#### Salaries distribution by gender
+```{r, echo=FALSE, fig.width=12, fig.height=6}
+library(ggplot2)
+theme_set(theme_minimal(base_size=16))
+options(scipen = 999)
+library(gridExtra)
+p1<-ggplot(df, aes(y=salary,colour=sex))+geom_boxplot()
+p2<-ggplot(df, aes(x=salary,colour=sex))+geom_density()
+
+grid.arrange(p1,p2, ncol=2)
+
+```
+
+
+```{r}
+print('Salary Quantiles for Males')
+round(quantile(df[sex=='Male']$salary, prob=seq(0,1,0.2)))
+print('Salary Quantiles for Females')
+round(quantile(df[sex=='Female']$salary, probs=seq(0,1,0.2)))
+```
+
+Apparently it does..  
+
+
+#### Let's perform a t-test to contrast if average salaries are statistically diffrerent depending on the proffesor's gender
+```{r}
+print(t.test(x=df[sex=='Male']$salary,
+             y=df[sex=='Female']$salary))
+```
+At a 95% level of confidence, the positive difference on males' is statistically significant.  
+
+
+#### But we also have to account for the rank of proffesor and the discipline
+```{r, echo=FALSE, fig.width=12, fig.height=6}
+p1<-ggplot(df, aes(y=salary,colour=rank))+geom_boxplot()
+p2<-ggplot(df, aes(x=salary,colour=rank))+geom_density()
+grid.arrange(p1,p2, ncol=2)
+
+p1<-ggplot(df, aes(y=salary,colour=discipline))+geom_boxplot()+scale_color_manual(values = c('orange','aquamarine'))
+p2<-ggplot(df, aes(x=salary,colour=discipline))+geom_density()+scale_color_manual(values = c('orange','aquamarine'))
+
+grid.arrange(p1,p2, ncol=2)
+
+```
+
+
+#### Creating a Multiple Linear Model to explain Salaries:
+```{r}
+lm1<-lm(salary~yrs.since.phd+sex, data=df)
+
+print(summary(lm1))
+
+```
+
+Both variables are significant at a 90% level but only yrs.since.phd at a 95% confidence.
+
+
+* The estimated increase on salary per additional year of experience since PhD is about +$1000.
+* The estimated difference on salaries between a male and a femal, controlling for experience since PhD, is about +$8000.
+
+ 
+Though, the power of these two variables to explain the total variability on salaries is quite low, with an $R^2$ of 18%.
+
