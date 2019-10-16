@@ -8,10 +8,8 @@
 
 
 # Introduction to RStudio
-# Console Statements
-# Creating, Saving and Loading R Scripts
-# Variable assigment
 # Types of variables
+# Built-in Functions
 
 
 #### WORKING DIRECTORY ###
@@ -36,15 +34,15 @@ print(y)
 
 #### TYPES OF VARIABLES ####
 
-# 5 basic type of variables in R: numeric, integer, logical, character and factor
+# four basic type of variables in R: numeric, logical, character and factor
 
 # coertion methods in R allow us to easily swicth the nature of a variable
-# as.numeric(), as.integer(), as.logical(), as.character(), as.factor()
+# as.numeric(), as.logical(), as.character(), as.factor()
 
 # class() tells us the type of a variable/object
 
 
-# numeric
+# 1. numeric
 x<-1.3    
 class(x)
 y=9
@@ -55,17 +53,8 @@ x<-c(3,2,4,5,1,6,3,9,2,7,3,6,5,7,8,1,2)  # the c() function combines elements cr
 x
 class(x)
 
-# integer
-x<-1
-class(x)
-x<-as.integer(x)
-print(x)
-class(x)
-x<-1L
-class(x)
 
-
-# logical
+# 2. logical
 x<-TRUE
 print(x)
 class(x)
@@ -73,27 +62,40 @@ x<-c(T,F,T)
 print(x)
 class(x)
 
-x<-as.numeric(x)
+x<-as.numeric(x) # converting from logical to numeric
 print(x)
 class(x)
+is.numeric(x) # this function asks for a concrete class of a variable 
+              # many built-in functions return boolean values (logical functions)
 
 x<-as.logical(x)
 print(x)
 class(x)
+is.numeric(x) 
+is.logical(x) 
 
-
-# character
+# 3. character
 x<-'hello world!!'
 print(x)
 class(x)
 x<-'1'
+print(x)
 class(x)
 
-x<-as.integer(x)
+x<-as.numeric(x)
+print(x)
 class(x)
 
-# factor: used for cathegory grouping in some analysis (MALE/FEMALE, CONTINENT, LEVEL OF STUDIES)
+# 4. factor: used for cathegory grouping in any king of analysis (MALE/FEMALE, CONTINENT, LEVEL OF STUDIES)
 x<-c('A','B','A','C','B','A')
+print(x)
+class(x)
+
+x<-factor(x)
+class(x)
+print(x)
+
+
 x<-factor(x,levels = c('C','B','A'))
 class(x)
 print(x)
@@ -113,6 +115,7 @@ x  # cannot coerce from character to numeric
 # c()  combines elements creating vector. Can combine vectors too
 
 x<-c(1,2,3,4,5)
+print(x)
 
 # elemnts must be of the same class, otherwise c() forces to a feasible common class
 
@@ -123,19 +126,20 @@ class(x)
 # a:b generates a sequence from a to b with unitary step
 
 x<-1:5
-
+print(x)
 # seq(from, to, by) generates a sequence from a to b with step specified with the by argument
 # type help(seq) or ?seq for further information
 
 
 x<-seq(from=2,to=10,by=2)  # arguments in functions are always assigned with =
+print(x)
 
 # x[n] returns the nth position in a vector
 x[3]
 # [n:m] returns positions n to m in a vector
 x[2:4]
 # [c(n,m)] returns positions n and m in a vector
-x[c(1,3,5)]
+# x[1,3,5]
 x[c(1,3:5)]
 x
 x[c(2,1,3,4,5)]
@@ -158,11 +162,13 @@ x
 order(x)
 order(-x)
 
+sort(x)
 x[order(x)] # equivalent to sort(x)
 
 
 # rep(x,times) replicates x, n times
-rep(3,5)
+rep(3,5) 
+
 
 # min/max Vs which.min/which.max returns the position of the vector with min/max value
 
@@ -183,9 +189,9 @@ mean(x); median(x); var(x); sd(x)
 # summary: applied to a numeric vector, returns a basic statistic summary
 summary(x)  
 
-summary(z<-c(2,3,NA))]
+summary(z<-c(2,3,NA))
 
-y<-rep(1,length(x))
+y<-rep(x[1],length(x))
 
 z<-x+y
 print(z)
@@ -209,6 +215,9 @@ as.numeric(is.na(y))
 
 
 # think...how could we easily count the number of NA's in a vector?
+sum(is.na(x))
+sum(is.na(y))
+sum(x>=40)
 
 
 # logic operators
@@ -272,12 +281,13 @@ paste0('a','b','c')
 a<- 'R is a great software'
 
 substr(a,1,1)
-substr(a,10,15)
+ substr(a,10,15) 
+
 substr(a,14,50)
 
 b <- c('Eddy','Shawn','Fred')
 
 grep('S',b)
-grep('S',b, value=T)
+grep(pattern = 'S',x = b, value=F )
 
 grep('dd',b, value=T)
